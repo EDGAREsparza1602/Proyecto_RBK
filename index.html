@@ -158,7 +158,7 @@ THREE.GLTFLoader = (function() {
   .scanlines { position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;z-index:3; }
   .hero-content { position:relative;z-index:4;padding:0 6vw 8vh;pointer-events:none; }
   .hero-tag { font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.3em;color:var(--orange);text-transform:uppercase;margin-bottom:1rem;opacity:0;animation:fadeUp 0.8s ease 0.3s forwards; }
-  .hero-title { font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,18vw,15rem);line-height:0.87;letter-spacing:-0.02em;opacity:0;animation:fadeUp 0.8s ease 0.5s forwards; }
+  .hero-title { font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,12vw,10rem);line-height:0.87;letter-spacing:-0.02em;opacity:0;animation:fadeUp 0.8s ease 0.5s forwards; }
   .hero-title span { color:var(--red);display:block; }
   .hero-sub { font-family:'Space Mono',monospace;font-size:0.72rem;color:#ffffff;margin-top:1.4rem;letter-spacing:0.15em;opacity:0;animation:fadeUp 0.8s ease 0.7s forwards; }
   .power-badge { display:inline-flex;align-items:center;gap:0.5rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.35);padding:0.45rem 1rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;color:var(--red);text-transform:uppercase;margin-top:1.4rem;opacity:0;animation:fadeUp 0.8s ease 0.9s forwards; }
@@ -690,7 +690,7 @@ loadModel();
   const canvas=document.getElementById('robot-canvas');
   const cont=document.getElementById('canvas-container');
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1 : 1.5));
   renderer.setSize(cont.offsetWidth,cont.offsetHeight);
 
   const scene=new THREE.Scene();
@@ -712,8 +712,15 @@ loadModel();
     scene.add(robot);
   });
 
+  let heroVisible = true;
+  const heroObs = new IntersectionObserver(entries => {
+    heroVisible = entries[0].isIntersecting;
+  }, {threshold: 0.1});
+  heroObs.observe(canvas);
+
   (function animate(){
     requestAnimationFrame(animate);
+    if(!heroVisible) return;
     t+=0.016;
     if(robot){
       robot.rotation.y+=0.005;
@@ -734,7 +741,7 @@ loadModel();
   const canvas=document.getElementById('sticky-canvas');
   const cont=document.getElementById('sticky-canvas-container');
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1 : 1.5));
   renderer.setSize(cont.offsetWidth,cont.offsetHeight);
 
   const scene=new THREE.Scene();
@@ -776,8 +783,15 @@ loadModel();
     scene.add(robot);
   });
 
+  let stickyVisible = false;
+  const stickyObs = new IntersectionObserver(entries => {
+    stickyVisible = entries[0].isIntersecting;
+  }, {threshold: 0.1});
+  stickyObs.observe(canvas);
+
   (function animate(){
     requestAnimationFrame(animate);
+    if(!stickyVisible) return;
     t+=0.016;
     updateScroll();
     currentY=lerp(currentY,targetY,0.06);
@@ -803,7 +817,7 @@ loadModel();
   if (!canvas) return;
 
   const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1 : 1.5));
   renderer.setSize(wrap.offsetWidth, wrap.offsetHeight);
   renderer.shadowMap.enabled = true;
 
@@ -842,8 +856,15 @@ loadModel();
     scene.add(robot);
   });
 
+  let interactiveVisible = false;
+  const interactiveObs = new IntersectionObserver(entries => {
+    interactiveVisible = entries[0].isIntersecting;
+  }, {threshold: 0.1});
+  interactiveObs.observe(canvas);
+
   (function animate(){
     requestAnimationFrame(animate);
+    if(!interactiveVisible) return;
     controls.update();
     if (robot) robot.position.y = Math.sin(Date.now()*0.001) * 0.06;
     renderer.render(scene, camera);
